@@ -1,0 +1,73 @@
+
+info:
+  app:
+    name: Vehicles API
+    description: Vehicles swagger first approach spring boot application
+    version: 1.0.0
+
+# Spring boot actuator configurations
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+
+# Configure Logging
+logging:
+  level:
+    root: INFO
+    au.com.reece: DEBUG
+    org.springframework: INFO
+    org.hibernate: ERROR
+    com.zaxxer.hikari: ERROR
+    org.apache.catalina: ERROR
+
+# Configure Spring specific properties
+spring:
+
+  # Enable/Disable hot swapping
+  devtools:
+    restart:
+      enabled: true
+      log-condition-evaluation-delta: false
+
+  # If there is no handler found for the request path, then throw error
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  # Properties for configuring jackson mapper
+  jackson:
+    mapper:
+      # For enums, consider case insensitive when parsing to json object
+      accept-case-insensitive-enums: true
+
+  resources:
+    add-mappings: false
+
+  # Datasource Configurations
+  h2:
+    console:
+      enabled: true
+      path: /h2
+      settings:
+        web-allow-others: true
+
+  sql:
+    init:
+      mode: always
+
+  datasource:
+    url: jdbc:h2:mem:vehicles-db;DB_CLOSE_DELAY=-1;
+    username: test
+    password:
+    driverClassName: org.h2.Driver
+
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+
+server:
+  error:
+    include-message: always

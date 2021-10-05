@@ -1,0 +1,162 @@
+openapi: 3.0.0
+
+################
+# API Info
+################
+info:
+  title: Vehicles API
+  description: API to get vehicles
+  version: 1.0.0
+
+################
+# API Servers
+################
+servers:
+  - url: http://localhost:8080/v1
+
+################
+# API Paths
+################
+paths:
+  /vehicles:
+    get:
+      summary: List of all vehicles
+      tags:
+        - "vehicle"
+      operationId: getVehicles
+      responses:
+        "200":
+          description: Sucess - List of all the vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vehicle"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /vehicles/{id}:
+    get:
+      summary: Get vehicle by id
+      operationId: getVehicleById
+      tags:
+        - vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of vehicle to retrieve
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/NormalCar"
+                  - $ref: "#/components/schemas/SuperCar"
+                  - $ref: "#/components/schemas/TransportTruck"
+                  - $ref: "#/components/schemas/MiningTruck"
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    NC: "#/components/schemas/NormalCar"
+                    SC: "#/components/schemas/SuperCar"
+                    TT: "#/components/schemas/TransportTruck"
+                    MT: "#/components/schemas/MiningTruck"
+
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Vehicle:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+      discriminator:
+        propertyName: type
+
+    Car:
+      allOf:
+        - $ref: "#/components/schemas/Vehicle"
+        - type: object
+          properties:
+            type:
+              enum:
+                - Car
+            seats:
+              type: integer
+
+    NormalCar:
+      allOf:
+        - $ref: "#/components/schemas/Car"
+        - type: object
+          properties:
+            type:
+              enum:
+                - NC
+            has_music_system:
+              type: boolean
+
+    SuperCar:
+      allOf:
+        - $ref: "#/components/schemas/Car"
+        - type: object
+          properties:
+            type:
+              enum:
+                - SC
+            has_booster:
+              type: boolean
+
+    TransportTruck:
+      allOf:
+        - $ref: "#/components/schemas/Vehicle"
+        - type: object
+          properties:
+            type:
+              enum:
+                - TT
+            has_music_system:
+              type: boolean
+
+    MiningTruck:
+      allOf:
+        - $ref: "#/components/schemas/Vehicle"
+        - type: object
+          properties:
+            type:
+              enum:
+                - MT
+            has_hydraulic_system:
+              type: boolean
+
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
